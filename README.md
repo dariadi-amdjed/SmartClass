@@ -197,19 +197,3 @@ The project demonstrated successful attendance tracking, parent notification fun
 SmartClass was developed as a student-led artificial intelligence and educational technology project to explore practical applications of computer vision, automation, and embedded systems in schools.
 
 ---
-
-## Author
-
-**Mohamed Amdjed Dariadi**
-
-AI Student & Builder from Algeria
-
-Areas of Interest:
-
-* Artificial Intelligence
-* Computer Vision
-* Educational Technology
-* Embedded Systems
-* Machine Learning
-
-GitHub: https://github.com/your-username
