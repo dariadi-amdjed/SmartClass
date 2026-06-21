@@ -1,6 +1,6 @@
 {
-  "current_teacher": "Jack",
-  "subject": "Math",
+  "current_teacher": "teacher",
+  "subject": "MATH",
   "status": "SAFE",
   "temperature": 27,
   "fire_section": null,
