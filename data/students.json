@@ -1,24 +1,24 @@
 [
   {
-    "name": "Moncef Sowalhi",
+    "name": "Name1",
     "first_name": "Moncef",
     "last_name": "Sowalhi",
     "dob": "2010-07-23",
     "section": "Section 1",
     "present": false,
     "roll": 1,
-    "parent_phone": "0776559991",
-    "image": "moncif.jpg"
+    "parent_phone": "0000000",
+    "image": "name1.jpg"
   },
   {
-    "name": "Amjad Driadi",
+    "name": "Name2",
     "first_name": "Amjad",
     "last_name": "Driadi",
     "dob": "2010-10-03",
     "section": "Section 1",
     "present": true,
     "roll": 2,
-    "parent_phone": "0776559991",
-    "image": "amdjed.jpg"
+    "parent_phone": "0000000",
+    "image": "name2.jpg"
   }
 ]
