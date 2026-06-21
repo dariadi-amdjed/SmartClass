@@ -58,12 +58,12 @@ class FireSensorController:
                 self.servo.write(self.SERVO_CLOSED)
             time.sleep(1)
             
-            print("✅ Arduino Connected Successfully")
-            print("🔥 Fire Detection System Ready")
+            print(" Arduino Connected Successfully")
+            print(" Fire Detection System Ready")
             return True
             
         except Exception as e:
-            print(f"❌ Failed To Connect To Arduino: {e}")
+            print(f" Failed To Connect To Arduino: {e}")
             return False
     
     def disconnect(self):
@@ -74,9 +74,9 @@ class FireSensorController:
             if self.board:
                 self.board.exit()
                 self.board = None
-            print("✅ Arduino Unconnected Successfully")
+            print(" Arduino Unconnected Successfully")
         except Exception as e:
-            print(f"❌ Error Disconnecting From Arduino: {e}")
+            print(f" Error Disconnecting From Arduino: {e}")
     
     def set_fire_detected_callback(self, callback):
         """Set a callback function when fire is detected
@@ -117,13 +117,13 @@ class FireSensorController:
                 time.sleep(0.1)
                 
             except Exception as e:
-                print(f"❌ Error In Monitoring Loop: {e}")
+                print(f" Error In Monitoring Loop: {e}")
                 time.sleep(0.5)
     
     def _activate_fire_response(self):
         """Activate response when fire is detected"""
         try:
-            print("🔥🚨 Fire detected! Activating responses...")
+            print(" Fire detected! Activating responses...")
             if self.buzzer:
                 self.buzzer.write(1)
             if self.servo:
@@ -135,12 +135,12 @@ class FireSensorController:
                 self.motor_in2.write(0)
                 
         except Exception as e:
-            print(f"❌ Error activating fire response: {e}")
+            print(f" Error activating fire response: {e}")
     
     def _deactivate_fire_response(self):
         """Deactivate response when fire is cleared"""
         try:
-            print("✅ Fire cleared. Stopping responses...")
+            print(" Fire cleared. Stopping responses...")
             if self.buzzer:
                 self.buzzer.write(0)
             if self.servo:
@@ -152,28 +152,28 @@ class FireSensorController:
                 self.motor_in2.write(0)
                 
         except Exception as e:
-            print(f"❌ Error deactivating fire response: {e}")
+            print(f" Error deactivating fire response: {e}")
     
     def start_monitoring(self):
         """Start fire sensor monitoring"""
         if self.board is None:
-            print("❌ Arduino is not connected. Please connect first.")
+            print(" Arduino is not connected. Please connect first.")
             return False
         
         if self.is_running:
-            print("⚠️ Monitoring is already running")
+            print(" Monitoring is already running")
             return False
         
         self.is_running = True
         self.monitor_thread = threading.Thread(target=self._monitor_loop, daemon=True)
         self.monitor_thread.start()
-        print("🟢 Fire sensor monitoring started")
+        print(" Fire sensor monitoring started")
         return True
     
     def stop_monitoring(self):
         """Stop fire sensor monitoring"""
         if not self.is_running:
-            print("⚠️ Monitoring is not active")
+            print(" Monitoring is not active")
             return False
         
         self.is_running = False
@@ -184,7 +184,7 @@ class FireSensorController:
         if self.monitor_thread:
             self.monitor_thread.join(timeout=1)
         
-        print("🔴 Fire sensor monitoring stopped")
+        print(" Fire sensor monitoring stopped")
         return True
     
     def get_fire_state(self):
