@@ -111,7 +111,7 @@ SmartClass/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/SmartClass.git
+git clone https://github.com/dariadi-amdjed/SmartClass.git
 cd SmartClass
 ```
 
