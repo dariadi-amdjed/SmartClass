@@ -91,7 +91,7 @@ Safety Alert System
 SmartClass/
 │
 ├── teacher_app.py
-├── firebase.py
+├── data.py
 ├── fire_sensor.py
 ├── requirements.txt
 │
