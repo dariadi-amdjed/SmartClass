@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, font
-import datetime, json, os, firebase, threading, time
+import datetime, json, os, data, threading, time
 import numpy as np
 
 # Import Fire Detection System
