@@ -139,7 +139,7 @@ class TeacherApp:
         if not name or not pwd:
             messagebox.showwarning('Required', 'Enter name and password')
             return
-        teachers = firebase.get_teachers()
+        teachers = data.get_teachers()
         matched = None
         for t in teachers:
             if t.get('name') == name and str(t.get('password', '')) == pwd:
@@ -150,7 +150,7 @@ class TeacherApp:
             return
         self.teacher = matched.get('name')
         self.subject = matched.get('subject')
-        firebase.set_current_teacher(self.teacher, self.subject)
+        data.set_current_teacher(self.teacher, self.subject)
         self.dashboard()
 
     # ============== FACE-LOGIN HELPERS ==============
@@ -204,7 +204,7 @@ class TeacherApp:
         # build mapping filename -> teacher (from teachers.json face_image ONLY - strict mapping)
         mapping = {}
         try:
-            teachers = firebase.get_teachers()
+            teachers = data.get_teachers()
         except Exception:
             teachers = []
         
@@ -225,7 +225,7 @@ class TeacherApp:
     def _assign_image_to_teacher_dialog(self, image_filename):
         """Ask user to choose a teacher to link to image_filename, then update teachers.json accordingly."""
         try:
-            teachers = firebase.get_teachers()
+            teachers = data.get_teachers()
         except Exception:
             teachers = []
 
@@ -305,7 +305,7 @@ class TeacherApp:
         faces_dir = os.path.join(os.path.dirname(__file__), 'data', 'students_img')
         known = {}  # key: student_name -> {'des':..., 'idx': index}
         try:
-            students = firebase.get_students()
+            students = data.get_students()
         except Exception as e:
             print(f"[ERROR] Failed to load students: {e}")
             students = []
@@ -529,7 +529,7 @@ class TeacherApp:
             try:
                 self.teacher = matched_teacher.get('name')
                 self.subject = matched_teacher.get('subject')
-                firebase.set_current_teacher(self.teacher, self.subject)
+                data.set_current_teacher(self.teacher, self.subject)
                 messagebox.showinfo('Done', f"Welcome {self.teacher} — Face recognition login successful")
                 self.dashboard()
             except Exception as e:
@@ -719,12 +719,12 @@ class TeacherApp:
         # Start background tasks
         self.auto_update_class_state()
         try:
-            firebase.process_scheduled_notifications()
+            data.process_scheduled_notifications()
         except Exception:
             pass
         try:
             if self.teacher:
-                firebase.touch_heartbeat(self.teacher)
+                data.touch_heartbeat(self.teacher)
         except Exception:
             pass
     
@@ -773,7 +773,7 @@ class TeacherApp:
         status_frame = tk.Frame(self.content, bg=COLOR_CARD, relief="flat", bd=0)
         status_frame.pack(fill="x", padx=20, pady=15)
         
-        state = firebase.get_class_state()
+        state = data.get_class_state()
         self.status_label = tk.Label(status_frame, 
                                     text=f"status_text", 
                                     font=self.font_subheading, fg=COLOR_TEXT, bg=COLOR_CARD)
@@ -899,7 +899,7 @@ class TeacherApp:
         
         table.pack(fill="both", expand=True, padx=10, pady=10)
 
-        students = firebase.get_students()
+        students = data.get_students()
         for i, s in enumerate(students):
             first = s.get('first_name') or (s.get('name') and s.get('name').split()[0]) or '-'
             last = s.get('last_name') or (s.get('name') and ' '.join(s.get('name').split()[1:])) or '-'
@@ -1008,7 +1008,7 @@ class TeacherApp:
         parent_phone_entry.configure(bg="white", relief="solid", bd=1, fg=COLOR_TEXT)
 
         def save():
-            students = firebase.get_students()
+            students = data.get_students()
             section = students[0].get('section', 'Section 1') if students else 'Section 1'
             rolls = [s.get('roll', 0) for s in students if s.get('section') == section]
             next_roll = max(rolls) + 1 if rolls else 1
@@ -1023,7 +1023,7 @@ class TeacherApp:
             students.append({"name": name, "first_name": first, "last_name": last, "present": None, 
                            "dob": dob_entry.get(), "section": section, "roll": next_roll, 
                            'parent_phone': parent_phone_entry.get()})
-            firebase.save("students", students)
+            data.save("students", students)
             win.destroy()
             messagebox.showinfo("✅ Done", "Student added successfully")
 
@@ -1060,11 +1060,11 @@ class TeacherApp:
         name = vals[0]
         
         if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete {name}?"):
-            students = firebase.get_students()
+            students = data.get_students()
             for i, s in enumerate(students):
                 if s.get('name') == name or s.get('first_name') == name:
                     students.pop(i)
-                    firebase.save('students', students)
+                    data.save('students', students)
                     messagebox.showinfo('✅ Done', f'{name} deleted successfully')
                     self.show_students()
                     return
@@ -1099,7 +1099,7 @@ class TeacherApp:
         lbl_student = tk.Label(frm, text="👤 Choose Student", font=self.font_subheading, fg=COLOR_TEXT, bg=COLOR_CARD)
         lbl_student.pack(anchor='w', pady=(0, 8))
 
-        students = firebase.get_students()
+        students = data.get_students()
         names = []
         for s in students:
             first = s.get('first_name') or (s.get('name') and s.get('name').split()[0]) or ''
@@ -1165,10 +1165,10 @@ class TeacherApp:
             
             # Send in background thread
             try:
-                threading.Thread(target=firebase.send_sms, args=(phone, message), daemon=True).start()
+                threading.Thread(target=data.send_sms, args=(phone, message), daemon=True).start()
             except Exception:
                 try:
-                    firebase.send_sms(phone, message)
+                    data.send_sms(phone, message)
                 except Exception:
                     pass
             
@@ -1321,7 +1321,7 @@ class TeacherApp:
                 bf = None
                 clahe = None
 
-            students = firebase.get_students()
+            students = data.get_students()
             # Reset all students to not present at the start of attendance session
             for s in students:
                 s['present'] = False
@@ -1474,7 +1474,7 @@ class TeacherApp:
                                         cv2.putText(frame, "(Already registered attendance)", (x, y + h + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
                                     else:
                                         students[idx]['present'] = True
-                                        firebase.cancel_scheduled_for_student(students[idx].get('name'))
+                                        data.cancel_scheduled_for_student(students[idx].get('name'))
                                         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
                                         cv2.putText(frame, "‏👤 " + best_name, (x, y - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 3)
                                         cv2.putText(frame, "✅ Welcome!", (x, y + h + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
@@ -1534,7 +1534,7 @@ class TeacherApp:
             
             # Save the final attendance state (the one we updated during camera session)
             try:
-                firebase.save("students", students)
+                data.save("students", students)
                 print("[ATTENDANCE] Final attendance state saved")
             except Exception as e:
                 print(f"[ERROR] Failed to save final attendance: {e}")
@@ -1549,7 +1549,7 @@ class TeacherApp:
             present_count = 0
             absent_count = 0
             
-            # Use the SAME students list we just saved (don't reload from Firebase)
+            # Use the SAME students list we just saved (don't reload from data)
             for s in students:
                 if s.get('section') == section:
                     # Mark student as absent if they don't have a registered image
@@ -1574,7 +1574,7 @@ class TeacherApp:
             
             # save updated attendance
             try:
-                firebase.save('students', students)
+                data.save('students', students)
             except Exception as e:
                 print(f"[ERROR] Error saving students: {e}")
             
@@ -1599,12 +1599,12 @@ class TeacherApp:
                     try:
                         print(f"[INFO] Sending message to {phone}: {msg}")
                         # open WhatsApp to send message
-                        threading.Thread(target=firebase.send_sms, args=(phone, msg), daemon=True).start()
+                        threading.Thread(target=data.send_sms, args=(phone, msg), daemon=True).start()
                         sent_count += 1
                     except Exception as e:
                         print(f"[ERROR] Error starting thread for {phone}: {e}")
                         try:
-                            firebase.send_sms(phone, msg)
+                            data.send_sms(phone, msg)
                             sent_count += 1
                         except Exception as e:
                             print(f"[ERROR] Error sending message to {phone}: {e}")
@@ -1626,12 +1626,12 @@ class TeacherApp:
         # Update class state heartbeat and monitor notifications
         try:
             if self.teacher:
-                firebase.touch_heartbeat(self.teacher)
+                data.touch_heartbeat(self.teacher)
         except Exception:
             pass
         # process scheduled notifications (absent -> send after delay)
         try:
-            firebase.process_scheduled_notifications()
+            data.process_scheduled_notifications()
         except Exception:
             pass
         self.root.after(30000, self.auto_update_class_state)
@@ -1653,7 +1653,7 @@ class TeacherApp:
                 return
             for i in table.get_children():
                 table.delete(i)
-            students = firebase.get_students()
+            students = data.get_students()
             for s in students:
                 first = s.get('first_name') or (s.get('name') and s.get('name').split()[0]) or '-'
                 last = s.get('last_name') or (s.get('name') and ' '.join(s.get('name').split()[1:])) or '-'
@@ -1722,7 +1722,7 @@ class TeacherApp:
             pass
         except Exception:
             pass
-        firebase.logout_teacher()
+        data.logout_teacher()
         self.login_screen()
 
     # ============== UTILITIES ==============
@@ -1744,7 +1744,7 @@ class TeacherApp:
     def process_absentees_after_camera(self):
         """Send absent notifications after camera session"""
         try:
-            students = firebase.get_students()
+            students = data.get_students()
             to_send = []
             for s in students:
                 if s.get('present') is not True:
@@ -1754,14 +1754,14 @@ class TeacherApp:
                         section = s.get('section', 'Unknown')
                         msg = f"🔔 Absence notice: Student {s.get('name')} did not attend today in section {section}"
                         to_send.append((phone, msg))
-            firebase.save('students', students)
+            data.save('students', students)
             # Send messages in background
             for phone, msg in to_send:
                 try:
-                    threading.Thread(target=firebase.send_sms, args=(phone, msg), daemon=True).start()
+                    threading.Thread(target=data.send_sms, args=(phone, msg), daemon=True).start()
                 except Exception:
                     try:
-                        firebase.send_sms(phone, msg)
+                        data.send_sms(phone, msg)
                     except Exception:
                         pass
         except Exception:
@@ -1771,10 +1771,10 @@ class TeacherApp:
     def restart_attendance(self):
         """Reset attendance status for all students"""
         try:
-            students = firebase.get_students()
+            students = data.get_students()
             for s in students:
                 s['present'] = None
-            firebase.save('students', students)
+            data.save('students', students)
             messagebox.showinfo('✅ Done', 'Attendance status reset for all students')
             self.show_students()
         except Exception:
@@ -1783,7 +1783,7 @@ class TeacherApp:
     def show_recorded_messages(self):
         """Show recorded absence messages for manual sending"""
         try:
-            messages = firebase.load('sent_messages')
+            messages = data.load('sent_messages')
         except Exception:
             messages = []
         
